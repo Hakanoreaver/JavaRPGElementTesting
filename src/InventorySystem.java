@@ -1,40 +1,37 @@
+import com.sun.org.apache.xpath.internal.SourceTree;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
-public class InventorySystem extends JPanel implements MouseListener, MouseMotionListener {
+public class InventorySystem extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
 
     Item[]  items;
     Item dragging;
-    int[] xCords;
-    int[] yCords;
-    int offsetX, offsetY, takenX, takenY;
-    int dragCount = 0;
-    int spriteSize;
-    int rowNum;
-    int colNum;
-    int widthGap;
-    int heightGap;
-    int heightDif, widthDif;
+    int[] xCords,yCords;
+    int dragCount = 0, spriteSize,rowNum,colNum,widthGap,heightGap,heightDif, widthDif,selected = 0,offsetX, offsetY, takenX, takenY;
     boolean firstPaint = false;
 
     public InventorySystem(int heightGap, int widthGap, int rowNum, int colNum, int spriteSize) {
         setUp(spriteSize,rowNum, colNum);
         doMathMakeSize(heightGap,widthGap,rowNum,colNum,spriteSize);
         repaint();
+
     }
 
     public InventorySystem(int xSize, int ySize, int rowNum, int colNum, int spriteSize, int useless) {
         setUp(spriteSize, rowNum, colNum);
         doMathSetSize(xSize, ySize, rowNum, colNum, spriteSize);
-        //initInventory(rowNum, colNum);
+
+        //Temporary for testing
         addItem("String", "Resources/ItemImages/Sword40.png");
         addItem("String", "Resources/ItemImages/ManaPotion40.png");
         addItem("String", "Resources/ItemImages/HealthPotion40.png");
         addItem("String", "Resources/ItemImages/Shield40.png");
+
+        //
+
         setPositions(rowNum, colNum);
         repaint();
     }
@@ -49,6 +46,7 @@ public class InventorySystem extends JPanel implements MouseListener, MouseMotio
         this.setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
+        addMouseWheelListener(this);
 
     }
 
@@ -80,9 +78,15 @@ public class InventorySystem extends JPanel implements MouseListener, MouseMotio
         this.widthGap = widthGap;
         this.heightGap = heightGap;
 
-        //initInventory(rowNum, colNum);
-        addItem("String", "Resources/ItemImages/Sword80.png");
+        //Temporary For Testing
+        addItem("String", "Resources/ItemImages/Sword40.png");
+        addItem("String", "Resources/ItemImages/ManaPotion40.png");
+        addItem("String", "Resources/ItemImages/HealthPotion40.png");
+        addItem("String", "Resources/ItemImages/Shield40.png");
+        //
+
         setPositions(rowNum, colNum);
+        System.out.println("Xsize " + xSize + " Ysize " + ySize);
     }
 
     private void doMathSetSize(int xSize, int ySize, int rowNum, int colNum, int spriteSize) {
@@ -113,10 +117,9 @@ public class InventorySystem extends JPanel implements MouseListener, MouseMotio
         this.heightGap = heightGap;
         widthDif = xSize - colNum*spriteSize + colNum *  (spriteSize + 1);
         heightDif = ySize - rowNum*spriteSize + rowNum *  (spriteSize + 1);
+        System.out.println("Xsize " + xSize + " Ysize " + ySize); // For Testing
     }
 
-    private void initInventory(int rowNum, int colNum) {
-    }
 
     private void setPositions(int rowNum, int colNum) {
         int count = 0;
@@ -167,6 +170,12 @@ public class InventorySystem extends JPanel implements MouseListener, MouseMotio
     }
 
     private void drawObjects(Graphics g) {
+        for (int i = 0; i < items.length; i++) {
+            if (yCords.length == 1) {
+                g.setColor(new Color(29, 68, 225));
+                g.fillRect(xCords[selected], yCords[0], spriteSize, spriteSize);
+            }
+        }
         for (Item i : items) {
             if (i != dragging && i != null) {
                 g.drawImage(i.getImage(),i.getX(),i.getY(),this);
@@ -297,6 +306,24 @@ public class InventorySystem extends JPanel implements MouseListener, MouseMotio
             }
         } catch (NullPointerException i) {
         }
+    }
+
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        mouseScrolled(e.getWheelRotation());
+    }
+
+    public void mouseScrolled(int motion) {
+        if (yCords.length == 1)
+            selected += motion;
+        if (selected < 0) selected = items.length - 1;
+        if (selected > items.length - 1) selected = 0;
+    }
+
+    public Item getSelected() {
+        if (yCords.length == 1) {
+            return items[selected];
+        }
+        else return null;
     }
 }
 

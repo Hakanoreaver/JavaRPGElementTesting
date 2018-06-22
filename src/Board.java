@@ -1,11 +1,10 @@
+import com.sun.javafx.PlatformUtil;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
-public class Board extends JPanel implements ActionListener {
+public class Board extends JPanel implements ActionListener, MouseWheelListener, MouseListener {
     private Timer timer;
     private boolean ingame;
     public final int B_WIDTH = 200;
@@ -14,7 +13,7 @@ public class Board extends JPanel implements ActionListener {
     int dx, dy, screenOffsetX, screenOffsetY, xMoved, yMoved;
     Player player;
 
-    InventorySystem p = new InventorySystem(500, 130, 2,8,40,0);
+    InventorySystem p = new InventorySystem(5, 5, 1,10,40);
 
     public Board() {
         initBoard();
@@ -22,12 +21,14 @@ public class Board extends JPanel implements ActionListener {
 
     private void initBoard() {
         setFocusable(true);
-        setBackground(Color.WHITE);
+        setBackground(Color.BLACK);
         addKeyListener(new TAdapter());
+        addMouseListener(this);
+        addMouseWheelListener(this);
         ingame = true;
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
         this.setLayout(null);
-        p.setLocation(250,(800-150));
+        p.setLocation(272,(800- 79));
         initCharacters();
         this.add(p);
         timer = new Timer(DELAY, this);
@@ -54,14 +55,18 @@ public class Board extends JPanel implements ActionListener {
         g.drawString("Game Over" , 160, 140);
     }
     private void drawObjects(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillRect(20, 650, player.health, 20);
-        g.setColor(Color.BLUE);
-        g.fillRect(20, 700, player.mana, 20);
-        g.setColor(Color.BLACK);
-        g.drawRect(20, 650, player.health, 20);
-        g.drawRect(20, 700, player.mana, 20);
-        g.drawImage(player.getImage(), player.getX(), player.getY(), this);
+        g.setColor(Color.GRAY);
+        g.fillRect(272, 700, 150, 16); //Draw Grey Health
+        g.setColor(Color.RED); // Drawing Health
+        g.fillRect(272, 700, (int) (Math.round(player.health * 1.5)), 15);
+        g.setColor(Color.GRAY);// Draw Grey Mana
+        g.fillRect(577, 700, 150, 16);
+        g.setColor(Color.BLUE); //Drawing Mana
+        g.fillRect(577, 700, (int) (Math.round(player.mana * 1.5)), 15);
+        g.setColor(Color.BLACK); // Drawing Outlines for the Mana and Health Bars
+        g.drawRect(272, 700, (int) (Math.round(player.health * 1.5)), 15);
+        g.drawRect(577, 700, (int) (Math.round(player.mana * 1.5)), 15);
+        g.drawImage(player.getImage(), player.getX(), player.getY(), this); //Drawing Player
     }
 
     @Override
@@ -123,6 +128,43 @@ public class Board extends JPanel implements ActionListener {
 
         if (key == KeyEvent.VK_D || key == KeyEvent.VK_RIGHT) {
             dx = 0;
+        }
+    }
+
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        p.mouseScrolled(e.getWheelRotation());
+    }
+
+    public void mousePressed(MouseEvent e) {
+    }
+
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    public void mouseMoved(MouseEvent e) {
+
+    }
+
+    public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            ItemDetails.itemRightClick("Sword", player);
+            System.out.println("Here");
+        }
+        if (e.getButton() == MouseEvent.BUTTON2) {
+            ItemDetails.itemRightClick("Sword", player);
+        }
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            System.out.println("Right Click");
         }
     }
 }
